@@ -1,25 +1,22 @@
-name: Multiplatform Build
+name: Multiplatform Desktop Build
 
 on:
   push:
     branches:
       - main
-    paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/build.yml"
-      - ".vscode/**"
-      - ".gitignore"
-      - "README.md"
-  pull_request:
+      - dev
+      - master
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build App
+    name: Build Desktop App (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
       - name: Checkout
@@ -28,7 +25,7 @@ jobs:
           submodules: recursive
 
       - name: Checkout assets
-        run: git -c submodule."assets".update=checkout submodule update --init assets
+        run: git -c submodule."assets".update=checkout submodule update --init assets || true
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -38,11 +35,23 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 26
+          node-version: 22
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm ci -F stoat-desktop
+        run: pnpm install --frozen-lockfile
 
-      - name: Build
+      - name: Package
         run: pnpm package
+
+      - name: Make Installers
+        run: pnpm make || true
+
+      - name: Upload Make Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stoat-desktop-${{ matrix.os }}
+          path: |
+            out/make/**/*
+            out/*.zip
+            out/*.tar.gz
