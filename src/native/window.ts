@@ -92,7 +92,7 @@ export function createMainWindow() {
   // load the entrypoint
   mainWindow
     .loadURL(BUILD_URL.toString())
-    .then(() => mainWindow.webContents.reload());
+    .then(() => mainWindow.webContents.reloadIgnoringCache());
 
   // minimise window to tray
   mainWindow.on("close", (event) => {
@@ -145,7 +145,11 @@ export function createMainWindow() {
       ((input.control || input.meta) && input.key.toLowerCase() === "r")
     ) {
       event.preventDefault();
-      mainWindow.webContents.reload();
+      if (input.shift || (input.control && input.key === "F5")) {
+        mainWindow.webContents.reloadIgnoringCache();
+      } else {
+        mainWindow.webContents.reload();
+      }
     }
   });
 

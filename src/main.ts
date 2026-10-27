@@ -45,6 +45,12 @@ if (!config.hardwareAcceleration) {
   app.disableHardwareAcceleration();
 }
 
+// set language to system locale
+const systemLocale = app.getLocale();
+if (systemLocale) {
+  app.commandLine.appendSwitch("lang", systemLocale);
+}
+
 // ensure only one copy of the application can run
 const acquiredLock = app.requestSingleInstanceLock();
 
