@@ -2,7 +2,7 @@ import { Menu, Tray, nativeImage } from "electron";
 
 import trayIconAsset from "../../assets/desktop/icon.png?asset";
 import macOsTrayIconAsset from "../../assets/desktop/iconTemplate.png?asset";
-import { version } from "../../package.json";
+import { version, localVersion } from "../../package.json";
 
 import { mainWindow, quitApp } from "./window";
 
@@ -46,7 +46,7 @@ export function updateTrayMenu() {
         type: "submenu",
         submenu: Menu.buildFromTemplate([
           {
-            label: version,
+            label: localVersion ? `${version} (${localVersion})` : version,
             type: "normal",
             enabled: false,
           },

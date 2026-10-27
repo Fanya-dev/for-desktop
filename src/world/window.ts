@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-import { version } from "../../package.json";
+import { version, localVersion } from "../../package.json";
 
 // stoat:// links wait in the main process until the app is ready for them,
 // so a reload before then loses nothing
@@ -22,7 +22,7 @@ contextBridge.exposeInMainWorld("native", {
     node: () => process.versions.node,
     chrome: () => process.versions.chrome,
     electron: () => process.versions.electron,
-    desktop: () => version,
+    desktop: () => (localVersion ? `${version} (${localVersion})` : version),
   },
 
   minimise: () => ipcRenderer.send("minimise"),
